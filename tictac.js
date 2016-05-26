@@ -18,10 +18,15 @@ Player.prototype.placeMarker = function(square) {
 		return false;
 	} else {
 		square.marker = this.marker;
-		console.log("success");
+		console.log("successfully placed in square " + square.place);
+
 		return true;
 	}
 };
+
+Player.prototype.executeMove = function(square){
+	this.placeMarker(square);
+}
 
 var AI = function(marker) {
 	Player.call(this, marker);
@@ -34,11 +39,13 @@ AI.prototype.executeMove = function(){
 	var stopFlag = false;
 	while(!stopFlag){
 		var randomPlace = Math.floor(Math.random() * (9));
-		stopFlag = this.placeMarker(board[randomPlace]);
+		game.board;
+		stopFlag = this.placeMarker(board[randomPlace]); //TODO Decouple AI's dependence on Game.board creation
 	}
 };
 
 var Game = function() {
+	this.currentPlayer = {};
 	this.winningMoves = [
 		[1,2,3], [4,5,6], [7,8.9], 
 		[1,4,7], [2,5,8], [3,6,9], 
@@ -49,8 +56,7 @@ var Game = function() {
 
 Game.prototype.createBoard = function(){
 	this.board = [];
-
-	for (var i = 1; i < 10; i++) {
+	for(var i = 1; i < 10; i++) {
 		this.board.push(new Square(i));
 	}
 
@@ -58,16 +64,47 @@ Game.prototype.createBoard = function(){
 };
 
 Game.prototype.awardVictory = function(player) {
-	player.score++
+	player.score++;
 };
 
 Game.prototype.checkVictory = function(){
-	var(var i = 0; i < this.winningMoves.length; i++) {
+	for(var i = 0; i < this.winningMoves.length; i++) {
 		var candidateArray = this.winningMoves[i];
-		if(candidateArray[0].marker == candidateArray[1].marker 
-		&& candidateArray[0].marker == candidateArray[2].marker) {
+		var place1 = candidateArray[0];
+		var place2 = candidateArray[1];
+		var place3 = candidateArray[2];
+		var squareA = this.board[place1 - 1];
+		var squareB = this.board[place2 - 1];
+		var squareC = this.board[place3 - 1];
+
+		if(squareA.marker && squareA.marker == squareB.marker && squareA.marker == squareC.marker) {
 			return true;
 		}
 	}
+}
+
+Game.prototype.commenceTurn = function(square){
+	this.currentPlayer.executeMove(square);
+	if(this.checkVictory()) {
+		this.awardVictory(this.currentPlayer);
+		this.createBoard();
+		this.currentPlayer = human;
+	}else{
+		this.currentPlayer = this.currentPlayer == human ? ai : human;
+		if(this.currentPlayer == ai){
+			this.commenceTurn();
+		}
+	}
+};
+
+var game = new Game();
+if(confirm("Click 'Ok' to be 'X,' 'Cancel' to be 'O'")) {
+	var human = new Player("X");
+	var ai = new AI("O");
+	game.currentPlayer = human;
+}else{
+	var human = new Player("O");
+	var ai = new AI("X");
+	game.currentPlayer = human;
 }
 
