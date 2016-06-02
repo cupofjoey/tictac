@@ -2,3 +2,17 @@ body{
 	background-color: grey;;
 	color: white;
 }
+
+#board{
+	height: 170px;
+	width: 170px;
+	border: 2px solid black;
+}
+
+.square{
+	height: 50px;
+	width: 50px;
+	background-color: green;
+	border: 1px solid black;
+	display: inline-block;
+}	
