@@ -1,6 +1,7 @@
-var Square = function (place) {
+var Square = function (place, gameInstance) {
 	this.place = place;
 	this.marker = null;
+	this.squareElement = this.generateElement(gameInstance);
 };
 
 Square.prototype.isOccupied = function() {
@@ -15,6 +16,7 @@ Square.prototype.generateElement = function(gameInstance) {
 		gameInstance.commenceTurn(squareScope);
 	});
 	gameInstance.boardElement.appendChild(squareElement);
+	return squareElement;
 };
 
 var Player = function(marker) {
@@ -28,8 +30,8 @@ Player.prototype.placeMarker = function(square) {
 		return false;
 	} else {
 		square.marker = this.marker;
+		square.squareElement.innerHTML = "<h1>" + this.marker + "</h1>";
 		console.log("successfully placed in square " + square.place);
-
 		return true;
 	}
 };
@@ -57,7 +59,7 @@ AI.prototype.executeMove = function(){
 var Game = function() {
 	this.currentPlayer = {};
 	this.winningMoves = [
-		[1,2,3], [4,5,6], [7,8.9], 
+		[1,2,3], [4,5,6], [7,8,9], 
 		[1,4,7], [2,5,8], [3,6,9], 
 		[1,5,9], [3,5,7]
 	];
@@ -70,12 +72,18 @@ Game.prototype.createBoard = function(){
 	this.boardElement.setAttribute("id", "board");
 
 	for(var i = 1; i < 10; i++) {
-		var square = new Square(i);
-		square.generateElement(this);
-		this.board.push(square);
+		this.board.push(new Square(i, this));
 	}
 	document.body.appendChild(this.boardElement);
 	console.log(this.board);
+};
+
+Game.prototype.resetBoard = function() {
+	for (var i = 0; i < 9; i++) {
+		var square = this.board[i];
+		square.marker = null;
+		square.squareElement.innerHTML = "";
+	}
 };
 
 Game.prototype.awardVictory = function(player) {
@@ -96,13 +104,30 @@ Game.prototype.checkVictory = function(){
 			return true;
 		}
 	}
-}
+};
 
-Game.prototype.commenceTurn = function(square){ 1
+Game.prototype.checkTie = function() {
+	//var isTie = true;
+	for (var i = 0; i < this.board.length; i++) {
+		var square = this.board[i];
+		if(!square.marker) {
+			return false;
+		}
+	}
+	return true;
+	//return isTie;
+};
+
+Game.prototype.commenceTurn = function(square){ 
 	if (this.currentPlayer.executeMove(square)) {
 		if(this.checkVictory()) {
 			this.awardVictory(this.currentPlayer);
-			this.createBoard();
+			alert("You Won! Resetting Board...");
+			this.resetBoard();
+			this.currentPlayer = human;
+		}else if (this.checkTie()) {
+			alert("Tie...Resetting Board...");
+			this.resetBoard();
 			this.currentPlayer = human;
 		}else{
 			this.currentPlayer = this.currentPlayer == human ? ai : human;

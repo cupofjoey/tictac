@@ -16,3 +16,8 @@ body{
 	border: 1px solid black;
 	display: inline-block;
 }	
+
+h1 {
+	font-family: Helvetica;
+	text-align: center;
+}
