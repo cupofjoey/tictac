@@ -98,7 +98,7 @@ Game.prototype.checkVictory = function(){
 	}
 }
 
-Game.prototype.commenceTurn = function(square){
+Game.prototype.commenceTurn = function(square){ 1
 	if (this.currentPlayer.executeMove(square)) {
 		if(this.checkVictory()) {
 			this.awardVictory(this.currentPlayer);
@@ -110,6 +110,8 @@ Game.prototype.commenceTurn = function(square){
 				this.commenceTurn();
 			}
 		}
+	}else{
+		alert("Space Occupied. Pick Another Please.");
 	}
 };
 
